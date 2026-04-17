@@ -198,6 +198,7 @@
 
 ## WINDOWS CORE / POWERSHELL
 
+    dhcp     
     sconfig                     # basis config menu
 
     rename-computer core1       # naam wijzigen
@@ -212,6 +213,10 @@
 
     New-SmbShare                # share maken
     Get-SmbShare                # shares bekijken
+
+    ## DHCP op Core
+
+    
 
 ## TROUBLESHOOTING (MEEST BELANGRIJK)
 
@@ -240,3 +245,26 @@
     SELinux blokkeert vaak
     permissions = grootste foutbron
     logs lezen = oplossing
+
+
+## DHCP op core
+
+Install-WindowsFeature -Name DHCP -IncludeManagementTools
+
+Add-DhcpServerInDC -DnsName "servernaam.domein.local" -IPAddress 192.168.1.10
+
+Start-Service dhcpserver
+Set-Service dhcpserver -StartupType Automatic
+
+Add-DhcpServerv4Scope `
+-Name "LAN Scope" `
+-StartRange 192.168.1.100 `
+-EndRange 192.168.1.200 `
+-SubnetMask 255.255.255.0
+
+Set-DhcpServerv4OptionValue `
+-ScopeId 192.168.1.0 `
+-Router 192.168.1.1 `
+-DnsServer 192.168.1.10 `
+-DnsDomain "domein.local"
+
